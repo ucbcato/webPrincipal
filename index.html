@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sistema Académico Nacional</title>
 <style>
   :root{
@@ -20,10 +21,11 @@
   *{box-sizing:border-box;}
   body{
     margin:0;
-    font-family:Arial,Helvetica Neue,sans-serif;
+    font-family:Arial,"Helvetica Neue",sans-serif;
     background:var(--bg-dark);
     color:var(--text);
   }
+
   /* TOP BAR */
   .topbar{
     background:#142840;
@@ -33,9 +35,18 @@
     padding:10px 20px;
     letter-spacing:0.1px;
     border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:80;
   }
   .topbar-left{display:flex;align-items:center;gap:15px;}
-  .topbar-left .menu-icon{font-size:22px;cursor:pointer;}
+  .topbar-left .menu-icon{
+    font-size:22px;cursor:pointer;
+    width:32px;height:32px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:4px;
+  }
+  .topbar-left .menu-icon:active{background:#1f3a57;}
   .topbar-left h1{font-size:18px;letter-spacing:1px;margin:0;font-weight:600;}
   .topbar-right{display:flex;align-items:center;gap:18px;}
   .icon-btn{position:relative;font-size:20px;cursor:pointer;color:var(--text);}
@@ -50,40 +61,29 @@
   .avatar{
     width:34px;height:34px;border-radius:50%;
     background:#3a4452;display:flex;align-items:center;justify-content:center;
-    font-size:18px;
+    font-size:18px;flex-shrink:0;
   }
-  .user-name{font-weight:600;letter-spacing:0.5px;font-size:14px;}
+  .user-name{font-weight:600;letter-spacing:0.5px;font-size:14px;white-space:nowrap;}
 
   /* LAYOUT */
-  .layout{display:flex;}
+  .layout{display:flex;position:relative;}
   .sidebar{
     width:260px;
+    flex-shrink:0;
     background:var(--bg-panel);
     min-height:calc(100vh - 56px);
     border-right:1px solid var(--border);
     padding:20px 0;
-  }
-  /* Responsive: mobile sidebar off-canvas */
-  @media (max-width:700px){
-    .layout{position:relative;}
-    .sidebar{
-      position:fixed;left:-280px;top:56px;height:calc(100vh - 56px);z-index:60;
-      width:260px;transition:left .25s ease;box-shadow:2px 0 8px rgba(0,0,0,.5);
-    }
-    .sidebar.open{left:0;}
-    .main{padding:14px;}
-    .topbar-left h1{font-size:15px}
-    .logo-box{padding:12px}
-    .scroll-wrap{overflow-x:auto}
-    /* make tables fit better */
-    table.grades{min-width:800px;font-size:13px}
+    transition:left .25s ease, transform .25s ease;
   }
   .logo-box{display:flex;align-items:center;gap:10px;padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:10px;}
   .logo-circle{
     width:50px;height:50px;border-radius:50%;
-    background:#0d1b2a;border:0px solid var(--gold);
+    background:#0d1b2a;
     display:flex;align-items:center;justify-content:center;
     font-size:10px;color:var(--gold);text-align:center;
+    flex-shrink:0;
+    overflow:hidden;
   }
   .logo-img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
   .logo-text b{display:block;color:#fff;font-size:14px;}
@@ -103,8 +103,17 @@
   .nav-sub:hover{background:#262c35;}
   .chev{margin-left:auto;font-size:11px;}
 
+  /* overlay para menú móvil */
+  .overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:55;
+  }
+
   /* MAIN */
-  .main{flex:1;padding:20px;overflow-x:auto;}
+  .main{flex:1;padding:20px;overflow-x:auto;min-width:0;}
 
   .period-bar{
     background:var(--blue-bar);
@@ -140,7 +149,7 @@
   table.grades tbody tr:nth-child(even){background:var(--bg-row-even);}
   table.grades tbody tr:nth-child(odd){background:var(--bg-row-odd);}
   .promedio-row td{font-weight:700;background:var(--bg-table-head)!important;}
-  .scroll-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:0 0 4px 4px;}
+  .scroll-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:0 0 4px 4px;-webkit-overflow-scrolling:touch;}
 
   /* PANELS */
   .panels{
@@ -175,17 +184,62 @@
   }
   .panel-table td:last-child, .panel-table th:last-child{text-align:right;}
   .panel-table tr:last-child td{border-bottom:none;}
-  
+
   ::-webkit-scrollbar{height:10px;width:10px;}
   ::-webkit-scrollbar-thumb{background:#3a4452;border-radius:5px;}
   ::-webkit-scrollbar-track{background:#1c2128;}
+
+  /* ===================== RESPONSIVE: TABLETS ===================== */
+  @media (max-width:900px){
+    .panel{min-width:100%;}
+  }
+
+  /* ===================== RESPONSIVE: MOBILE ===================== */
+  @media (max-width:700px){
+    .topbar{padding:8px 12px;}
+    .topbar-left{gap:8px;}
+    .topbar-left h1{font-size:14px;letter-spacing:0.5px;}
+    .topbar-right{gap:10px;}
+    .icon-btn{font-size:18px;}
+    .user-name{display:none;} /* solo se ve el avatar en móvil */
+
+    .sidebar{
+      position:fixed;
+      top:0;
+      left:0;
+      height:100vh;
+      transform:translateX(-100%);
+      z-index:70;
+      box-shadow:4px 0 18px rgba(0,0,0,.5);
+    }
+    .sidebar.open{
+      transform:translateX(0);
+    }
+    .overlay.show{display:block;}
+
+    .main{padding:12px;}
+
+    .period-bar{font-size:12.5px;padding:10px;}
+
+    table.grades{min-width:760px;font-size:12px;}
+    table.grades th, table.grades td{padding:10px 6px;}
+
+    .panel{min-width:100%;}
+    .panel-header{padding:14px 14px;}
+    .panel-table th, .panel-table td{padding:10px 14px;font-size:13px;}
+  }
+
+  @media (max-width:420px){
+    .topbar-left h1{font-size:12px;}
+    table.grades{min-width:680px;}
+  }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="topbar-left">
-    <span class="menu-icon">&#9776;</span>
+    <span class="menu-icon" id="menuToggle">&#9776;</span>
     <h1>SISTEMA ACADÉMICO NACIONAL</h1>
   </div>
   <div class="topbar-right">
@@ -199,8 +253,10 @@
   </div>
 </div>
 
+<div class="overlay" id="overlay"></div>
+
 <div class="layout">
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="logo-box">
       <div class="logo-circle"><img src="ucb.png" alt="Logo UCB" class="logo-img"></div>
       <div class="logo-text">
@@ -216,7 +272,7 @@
     <div class="nav-sub">Kardex</div>
     <div class="nav-sub">Kardex Consolidado</div>
 
-    <div class="nav-item" onclick="location.href='https://academico.ucb.edu.bo/AcademicoNacional/administracion/ofertaDeMaterias'""> Oferta Académica <span class="chev">&#9662;</span></div>
+    <div class="nav-item" onclick="location.href='https://academico.ucb.edu.bo/AcademicoNacional/administracion/ofertaDeMaterias'"> Oferta Académica <span class="chev">&#9662;</span></div>
     <div class="nav-item" onclick="location.href='https://cajap.ucb.edu.bo/UCBPagosWeb/Default.aspx'"> Pagos <span class="chev">&#9662;</span></div>
     <div class="nav-item" onclick="location.href='https://academico.ucb.edu.bo/AcademicoNacional/fileVirtualEstudiante/perfil'"> Mi Cuenta <span class="chev">&#9662;</span></div>
     <div class="nav-item" onclick="location.href='https://vimeo.com/showcase/lms-estudiantes'"> Guías Para Estudiantes <span class="chev">&#9662;</span></div>
@@ -350,6 +406,46 @@
   </div>
 </div>
 
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const menuToggle = document.getElementById('menuToggle');
+
+  function openMenu(){
+    sidebar.classList.add('open');
+    overlay.classList.add('show');
+  }
+  function closeMenu(){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  }
+
+  menuToggle.addEventListener('click', function(){
+    if(sidebar.classList.contains('open')){
+      closeMenu();
+    }else{
+      openMenu();
+    }
+  });
+
+  overlay.addEventListener('click', closeMenu);
+
+  // Cierra el menú automáticamente al elegir una opción, solo en móvil
+  document.querySelectorAll('.nav-item, .nav-sub').forEach(function(item){
+    item.addEventListener('click', function(){
+      if(window.innerWidth <= 700){
+        closeMenu();
+      }
+    });
+  });
+
+  // Si el usuario agranda la ventana, aseguramos que el menú quede en estado normal
+  window.addEventListener('resize', function(){
+    if(window.innerWidth > 700){
+      closeMenu();
+    }
+  });
+</script>
+
 </body>
-</html>
 </html>
