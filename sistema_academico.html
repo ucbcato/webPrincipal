@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema Académico Nacional</title>
+<style>
+  :root{
+    --bg-dark:#15191f;
+    --bg-panel:#1c2128;
+    --bg-table-head:#262c35;
+    --bg-row-even:#1f242c;
+    --bg-row-odd:#23282f;
+    --blue-bar: #052845;
+    --blue-accent:#2d6fa3;
+    --border:#333a44;
+    --text:#e6e8eb;
+    --text-dim:#9aa3ad;
+    --gold:#cda434;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:Arial,Helvetica Neue,sans-serif;
+    background:var(--bg-dark);
+    color:var(--text);
+  }
+  /* TOP BAR */
+  .topbar{
+    background:#142840;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 20px;
+    letter-spacing:0.1px;
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-left{display:flex;align-items:center;gap:15px;}
+  .topbar-left .menu-icon{font-size:22px;cursor:pointer;}
+  .topbar-left h1{font-size:18px;letter-spacing:1px;margin:0;font-weight:600;}
+  .topbar-right{display:flex;align-items:center;gap:18px;}
+  .icon-btn{position:relative;font-size:20px;cursor:pointer;color:var(--text);}
+  .badge{
+    position:absolute;top:-6px;right:-8px;
+    background:#2266dd;color:#fff;
+    font-size:11px;border-radius:50%;
+    width:16px;height:16px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .user-box{display:flex;align-items:center;gap:10px;}
+  .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:#3a4452;display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+  }
+  .user-name{font-weight:600;letter-spacing:0.5px;font-size:14px;}
+
+  /* LAYOUT */
+  .layout{display:flex;}
+  .sidebar{
+    width:260px;
+    background:var(--bg-panel);
+    min-height:calc(100vh - 56px);
+    border-right:1px solid var(--border);
+    padding:20px 0;
+  }
+  /* Responsive: mobile sidebar off-canvas */
+  @media (max-width:700px){
+    .layout{position:relative;}
+    .sidebar{
+      position:fixed;left:-280px;top:56px;height:calc(100vh - 56px);z-index:60;
+      width:260px;transition:left .25s ease;box-shadow:2px 0 8px rgba(0,0,0,.5);
+    }
+    .sidebar.open{left:0;}
+    .main{padding:14px;}
+    .topbar-left h1{font-size:15px}
+    .logo-box{padding:12px}
+    .scroll-wrap{overflow-x:auto}
+    /* make tables fit better */
+    table.grades{min-width:800px;font-size:13px}
+  }
+  .logo-box{display:flex;align-items:center;gap:10px;padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+  .logo-circle{
+    width:50px;height:50px;border-radius:50%;
+    background:#0d1b2a;border:0px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;color:var(--gold);text-align:center;
+  }
+  .logo-img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .logo-text b{display:block;color:#fff;font-size:14px;}
+  .logo-text span{font-size:11px;color:var(--text-dim);}
+
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 20px;cursor:pointer;
+    font-size:14px;color:var(--text);
+    border-left:3px solid transparent;
+  }
+  .nav-item:hover{background:#262c35;}
+  .nav-item.active{border-left:3px solid var(--blue-accent);background:#222831;}
+  .nav-sub{
+    padding:10px 20px 10px 48px;font-size:13.5px;cursor:pointer;color:var(--text);
+  }
+  .nav-sub:hover{background:#262c35;}
+  .chev{margin-left:auto;font-size:11px;}
+
+  /* MAIN */
+  .main{flex:1;padding:20px;overflow-x:auto;}
+
+  .period-bar{
+    background:var(--blue-bar);
+    text-align:center;
+    padding:12px;
+    border-radius:4px 4px 0 0;
+    font-size:14px;
+    line-height:1.6;
+  }
+  .period-bar b{font-weight:700;}
+
+  table.grades{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--bg-panel);
+    font-size:13.5px;
+    min-width:1100px;
+  }
+  table.grades th{
+    background:var(--bg-table-head);
+    color:var(--text-dim);
+    padding:14px 10px;
+    text-align:center;
+    font-weight:600;
+    border:1px solid var(--border);
+  }
+  table.grades td{
+    padding:14px 10px;
+    text-align:center;
+    border:1px solid var(--border);
+    vertical-align:middle;
+  }
+  table.grades tbody tr:nth-child(even){background:var(--bg-row-even);}
+  table.grades tbody tr:nth-child(odd){background:var(--bg-row-odd);}
+  .promedio-row td{font-weight:700;background:var(--bg-table-head)!important;}
+  .scroll-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:0 0 4px 4px;}
+
+  /* PANELS */
+  .panels{
+    display:flex;
+    gap:20px;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+  .panel{
+    flex:1;
+    min-width:380px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .panel-header{
+    display:flex;align-items:center;gap:14px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--border);
+  }
+  .panel-header .logo-circle{width:42px;height:42px;font-size:8px;}
+  .panel-header h2{margin:0;font-size:18px;}
+  .panel-header p{margin:2px 0 0;font-size:12px;color:var(--text-dim);}
+  .panel-table{width:100%;border-collapse:collapse;font-size:14px;}
+  .panel-table th{
+    text-align:left;color:var(--text-dim);font-weight:600;
+    padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;
+  }
+  .panel-table td{
+    padding:12px 20px;border-bottom:1px solid var(--border);
+  }
+  .panel-table td:last-child, .panel-table th:last-child{text-align:right;}
+  .panel-table tr:last-child td{border-bottom:none;}
+  
+  ::-webkit-scrollbar{height:10px;width:10px;}
+  ::-webkit-scrollbar-thumb{background:#3a4452;border-radius:5px;}
+  ::-webkit-scrollbar-track{background:#1c2128;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="menu-icon">&#9776;</span>
+    <h1>SISTEMA ACADÉMICO NACIONAL</h1>
+  </div>
+  <div class="topbar-right">
+    <span class="icon-btn">&#9638;</span>
+    <span class="icon-btn">&#8593;</span>
+    <span class="icon-btn">&#128172;<span class="badge">0</span></span>
+    <div class="user-box">
+      <div class="avatar">&#128100;</div>
+      <span class="user-name">CABEZAS LAURA MIJAEL</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="logo-box">
+      <div class="logo-circle"><img src="ucb.png" alt="Logo UCB" class="logo-img"></div>
+      <div class="logo-text">
+        <b>UNIVERSIDAD</b>
+        <b>CATÓLICA</b>
+        <span>BOLIVIANA</span>
+      </div>
+    </div>
+
+    <div class="nav-item" onclick="location.href='https://academico.ucb.edu.bo/AcademicoNacional/estudiantes/misMaterias'"> Mis Estudios <span class="chev">&#9662;</span></div>
+
+    <div class="nav-item active">Historial Académico <span class="chev">&#9652;</span></div>
+    <div class="nav-sub">Kardex</div>
+    <div class="nav-sub">Kardex Consolidado</div>
+
+    <div class="nav-item" onclick="location.href='https://academico.ucb.edu.bo/AcademicoNacional/administracion/ofertaDeMaterias'""> Oferta Académica <span class="chev">&#9662;</span></div>
+    <div class="nav-item" onclick="location.href='https://cajap.ucb.edu.bo/UCBPagosWeb/Default.aspx'"> Pagos <span class="chev">&#9662;</span></div>
+    <div class="nav-item" onclick="location.href='https://academico.ucb.edu.bo/AcademicoNacional/fileVirtualEstudiante/perfil'"> Mi Cuenta <span class="chev">&#9662;</span></div>
+    <div class="nav-item" onclick="location.href='https://vimeo.com/showcase/lms-estudiantes'"> Guías Para Estudiantes <span class="chev">&#9662;</span></div>
+    <div class="nav-item" onclick="location.href='https://www.ebooks7-24.com/biblioteca.aspx'"> Biblioteca Virtual</div>
+  </div>
+
+  <div class="main">
+    <div class="period-bar">
+      <div>Periodo Académico: 1-2026</div>
+      <div>Del: 02/02/2026 al 29/06/2026</div>
+      <div><b>Carrera: INGENIERIA DE SISTEMAS</b></div>
+    </div>
+
+    <div class="scroll-wrap">
+      <table class="grades">
+        <thead>
+          <tr>
+            <th>Sede</th>
+            <th>Sigla de la<br>Carrera</th>
+            <th>Sigla de la<br>Asignatura</th>
+            <th>Nombre de la Asignatura</th>
+            <th>Tipo de Paralelo</th>
+            <th>Paralelo</th>
+            <th>Evaluación<br>Continua</th>
+            <th>Referencia</th>
+            <th>Nota de<br>Evaluación<br>Final</th>
+            <th>Nota<br>Final</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SEDE COCHABAMBA</td><td>IDM</td><td>LEN-103</td>
+            <td>INGLES IV</td><td>CURSO DE IDIOMAS<br>(NO CURRICULAR)</td>
+            <td>1</td><td>64</td><td>PRIMERA INSTANCIA 1-2026</td><td>68</td><td>66</td>
+          </tr>
+          <tr>
+            <td>SEDE COCHABAMBA</td><td>ING</td><td>SIS-113</td>
+            <td>PROGRAMACION AVANZADA</td><td>ESTANDAR</td>
+            <td>1</td><td>64</td><td>PRIMERA INSTANCIA 1-2026</td><td>82</td><td>73</td>
+          </tr>
+          <tr>
+            <td>SEDE COCHABAMBA</td><td>ING</td><td>SIS-161</td>
+            <td>METODOLOGÍA DE LA INVESTIGACIÓN</td><td>ESTANDAR</td>
+            <td>1</td><td>76</td><td>PRIMERA INSTANCIA 1-2026</td><td>30</td><td>53</td>
+          </tr>
+          <tr>
+            <td>SEDE COCHABAMBA</td><td>ING</td><td>SIS-221</td>
+            <td>BASES DE DATOS II</td><td>ESTANDAR</td>
+            <td>1</td><td>81</td><td>PRIMERA INSTANCIA 1-2026</td><td>60</td><td>71</td>
+          </tr>
+          <tr>
+            <td>SEDE COCHABAMBA</td><td>ING</td><td>SIS-231</td>
+            <td>REDES DE COMPUTADORAS I</td><td>ESTANDAR</td>
+            <td>2</td><td>78</td><td>PRIMERA INSTANCIA 1-2026</td><td>63</td><td>71</td>
+          </tr>
+          <tr class="promedio-row">
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            <td style="text-align:right;">Promedio</td><td></td><td>66.80</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="logo-circle"><img src="ucb.png" alt="Logo UCB" class="logo-img"></div>
+          <div>
+            <h2>RESUMEN</h2>
+            <p>UNIVERSIDAD CATÓLICA BOLIVIANA "SAN PABLO"</p>
+          </div>
+        </div>
+        <table class="panel-table">
+          <tr><th>Concepto</th><th>Valor</th></tr>
+          <tr><td>Asignaturas sin nota:</td><td>0</td></tr>
+          <tr><td>Asignaturas aprobadas:</td><td>24</td></tr>
+          <tr><td>Asignaturas pendientes:</td><td>0</td></tr>
+          <tr><td>Asignaturas no habilitadas:</td><td>0</td></tr>
+          <tr><td>Asignaturas con pérdida de habilitación:</td><td>0</td></tr>
+          <tr><td>Asignaturas con abandono parcial:</td><td>0</td></tr>
+          <tr><td>Asignaturas con abandono total:</td><td>0</td></tr>
+          <tr><td>Asignaturas en las que No se presentó:</td><td>0</td></tr>
+          <tr><td>Sesiones Reprobadas:</td><td>0</td></tr>
+          <tr><td>Sesiones en las que No se presentó:</td><td>0</td></tr>
+          <tr><td>Asignaturas convalidadas:</td><td>0</td></tr>
+          <tr><td>Total de Asignaturas:</td><td>24</td></tr>
+          <tr><td>Total Semestres:</td><td>5</td></tr>
+          <tr><td>Unidades de Valor Económico Aprobadas:</td><td>79</td></tr>
+          <tr><td>Total Sesiones:</td><td>17</td></tr>
+          <tr><td>Total Reprobaciones:</td><td>0</td></tr>
+          <tr><td>Promedio General:</td><td>77.19</td></tr>
+        </table>
+      </div>
+
+      <div class="panel" style="align-self:flex-start;">
+        <div class="panel-header">
+          <div class="logo-circle"><img src="ucb.png" alt="Logo UCB" class="logo-img"></div>
+          <div>
+            <h2>ABREVIATURAS</h2>
+            <p>UNIVERSIDAD CATÓLICA BOLIVIANA "SAN PABLO"</p>
+          </div>
+        </div>
+        <table class="panel-table">
+          <tr><th>Nombre</th><th>Abreviatura</th></tr>
+          <tr><td>Abandono Total</td><td>AHT</td></tr>
+          <tr><td>Abandono Parcial</td><td>AHP</td></tr>
+          <tr><td>Abandono Rotación Parcial</td><td>ARP</td></tr>
+          <tr><td>No Se Presentó</td><td>NSP</td></tr>
+          <tr><td>No Habilitado</td><td>NHA</td></tr>
+          <tr><td>Aprobado</td><td>APR</td></tr>
+          <tr><td>Reprobado</td><td>REP</td></tr>
+          <tr><td>Suspendido</td><td>SUSP</td></tr>
+          <tr><td>Cumplido</td><td>CUM</td></tr>
+          <tr><td>No Cumplido</td><td>NCUM</td></tr>
+        </table>
+
+        <div class="panel-header" style="border-top:1px solid var(--border);">
+          <div class="logo-circle"><img src="ucb.png" alt="Logo UCB" class="logo-img"></div>
+          <div>
+            <h2>OTRAS ASIGNATURAS</h2>
+            <p>UNIVERSIDAD CATÓLICA BOLIVIANA "SAN PABLO"</p>
+          </div>
+        </div>
+        <table class="panel-table">
+          <tr><th>Nombre</th><th>Estado</th></tr>
+          <tr><td>Último nivel de inglés:</td><td>INGLES IV (B2)</td></tr>
+          <tr><td>Cursos de Formación Integral:</td><td>0 de 4</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+</html>
